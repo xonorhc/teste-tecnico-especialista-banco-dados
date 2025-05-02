@@ -7,7 +7,7 @@ PGDATABASE=teste
 PGUSER=$2
 PGPASS=$3
 
-# NOTE: Criar o banco de dados com suposta configuracao:
+# NOTE: CRIAR O BANCO DE DADOS COM SUPOSTA CONFIGURACAO:
 
 psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d 'postgres' \
   -c "create database $PGDATABASE with owner $PGUSER template template0 encoding 'WIN1252' locale 'pt-BR-x-icu' icu_locale 'pt-BR' locale_provider icu ;"
@@ -15,13 +15,39 @@ psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d 'postgres' \
 psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
   -c "create extension if not exists postgis;"
 
-# NOTE: Criar as tabelas:
+# NOTE: IMPORTAR OS DADOS DO IBGE:
+
+curl "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_UF_2022.zip" \
+  --output "$DIR"/dml/uf.zip
+
+unzip "$DIR"/dml/uf.zip -d "$DIR"/dml/uf/
+
+ogr2ogr -f PostgreSQL \
+  PG:"host=$PGHOST user=$PGUSER password=$PGPASS dbname=$PGDATABASE" \
+  -nln unidades_federacao "$DIR"/dml/uf/*.shp \
+  -nlt PROMOTE_TO_MULTI -lco precision=NO
+
+rm -rf "$DIR"/dml/uf*
+
+curl "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_Municipios_2022.zip" \
+  --output "$DIR"/dml/municipios.zip
+
+unzip "$DIR"/dml/municipios.zip -d "$DIR"/dml/municipios/
+
+ogr2ogr -f PostgreSQL \
+  PG:"host=$PGHOST user=$PGUSER password=$PGPASS dbname=$PGDATABASE" \
+  -nln municipios "$DIR"/dml/municipios/*.shp \
+  -nlt PROMOTE_TO_MULTI -lco precision=NO
+
+rm -rf "$DIR"/dml/municipios*
+
+# NOTE: CRIAR AS TABELAS:
 
 find "$DIR"/ddl -type f -name "*.sql" -exec \
   psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE -b \
   -f {} \;
 
-# NOTE: Importar os dados do INMET:
+# NOTE: IMPORTAR OS DADOS DO INMET:
 
 Y=2021
 
@@ -30,7 +56,7 @@ wget --no-check-certificate -O "$DIR"/dml/$Y.zip \
 
 unzip "$DIR"/dml/$Y.zip -d "$DIR"/dml/$Y
 
-# NOTE: Extrair as informacoes das estacoes:
+# NOTE: EXTRAIR AS INFORMACOES DAS ESTACOES:
 
 find "$DIR"/dml/$Y/ -type f -name "*.CSV" -print0 | xargs -0 -I{} \
   awk -F ';' 'FNR <= 8 { printf "%s;", $2 } END { print "" }' '{}' \
@@ -39,7 +65,7 @@ find "$DIR"/dml/$Y/ -type f -name "*.CSV" -print0 | xargs -0 -I{} \
 psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
   -c "\copy estacoes from '$DIR/dml/$Y/estacoes.csv' with delimiter ';' csv;"
 
-# NOTE: Extrair os dados temporais:
+# NOTE: EXTRAIR OS DADOS TEMPORAIS:
 
 find "$DIR"/dml/$Y/ -type f -name "*.CSV" -print0 | xargs -0 -I{} \
   awk -F ';' \
@@ -51,7 +77,7 @@ psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
 
 rm -rf "$DIR"/dml/"$Y"*
 
-# NOTE: Adicionar o anexo no banco de dados:
+# NOTE: ADICIONAR O ANEXO NO BANCO DE DADOS:
 
 unzip "$DIR"/dml/AREA_IMOVEL.zip -d "$DIR"/dml/area_imovel
 
@@ -62,7 +88,7 @@ ogr2ogr -f PostgreSQL \
 
 rm -rf "$DIR"/dml/area_imovel/
 
-# NOTE: Importar dados do SICAR:
+# NOTE: IMPORTAR DADOS DO SICAR:
 
 BASIS_URL="https://geoserver.car.gov.br/geoserver/sicar/sicar_imoveis_ac/ows?service=WFS"
 LAYER="sicar:"
