@@ -10,7 +10,7 @@ PGPASS=$3
 # NOTE: Criar o banco de dados com suposta configuracao:
 
 psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d 'postgres' \
-  -c "create database $PGDATABASE encoding 'WIN1252' locale_provider icu icu_locale 'pt-BR' locale 'pt-BR-x-icu' template template0;"
+  -c "create database $PGDATABASE with owner $PGUSER template template0 encoding 'WIN1252' locale 'pt-BR-x-icu' icu_locale 'pt-BR' locale_provider icu ;"
 
 psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
   -c "create extension if not exists postgis;"
