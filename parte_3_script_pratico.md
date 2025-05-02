@@ -4,7 +4,11 @@
 
 Você deverá construir uma solução de ETL simples para dados geoespaciais públicos do CAR (Cadastro Ambiental Rural).
 
-1. Crie um banco de dados armazene os dados do CAR disponíveis no arquivo enviado em anexo.
+<br/>
+
+#### 1. Crie um banco de dados armazene os dados do CAR disponíveis no arquivo enviado em anexo.
+
+<br/>
 
 ```sh
 #!/bin/bash
@@ -28,7 +32,11 @@ ogr2ogr -f PostgreSQL \
   -nlt PROMOTE_TO_MULTI -lco precision=NO
 ```
 
-2. Realize o download de uma versão mais atualizada dos dados, utilizando o WFS público disponibilizado pelo [SICAR](https://geoserver.car.gov.br/geoserver/sicar/ows?version=1.0.0&typeName=sicar%3Asicar_imoveis_ac)
+<br/>
+
+#### 2. Realize o download de uma versão mais atualizada dos dados, utilizando o WFS público disponibilizado pelo [SICAR](https://geoserver.car.gov.br/geoserver/sicar/ows?version=1.0.0&typeName=sicar%3Asicar_imoveis_ac)
+
+<br/>
 
 ```sh
 #!/bin/bash
@@ -44,15 +52,20 @@ LAYER=sicar
 LAYERNAME=sicar_imoveis_ac
 
 ogr2ogr -skipfailures -f geojson $DIR/$LAYERNAME.json \
-  --config GDAL_HTTP_UNSAFESSL YES WFS:$BASIS_URL "$LAYER":"$LAYERNAME"
+ --config GDAL_HTTP_UNSAFESSL YES WFS:$BASIS_URL "$LAYER":"$LAYERNAME"
 
 ogr2ogr -f PostgreSQL \
-  PG:"host=$PGHOST user=$PGUSER password=$PGPASS dbname=$PGDATABASE" \
-  -nln $LAYERNAME \
+ PG:"host=$PGHOST user=$PGUSER password=$PGPASS dbname=$PGDATABASE" \
+ -nln $LAYERNAME \
   $DIR/"$LAYERNAME".json
+
 ```
 
-3. Compare os dados baixados com os dados já existentes no banco, utilizando hash ou timestamp para identificar alterações.
+<br/>
+
+#### 3. Compare os dados baixados com os dados já existentes no banco, utilizando hash ou timestamp para identificar alterações.
+
+<br/>
 
 Comparando dados pela data de atualizacao:
 
@@ -93,7 +106,11 @@ FROM ai
 WHERE NOT st_equals (ai.geom, sia.geom);
 ```
 
-4. Atualize somente os registros alterados, preservando a integridade dos dados.
+<br/>
+
+#### 4. Atualize somente os registros alterados, preservando a integridade dos dados.
+
+<br/>
 
 Atualizando dado conforme data de atualizacao:
 
