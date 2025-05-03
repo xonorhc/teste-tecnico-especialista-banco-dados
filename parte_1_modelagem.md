@@ -2,27 +2,23 @@
 
 ## Modelo de dados conceitual
 
-@startuml
-@startchen
-
-entity microdados {
-}
-entity estacao {
-}
-relationship id_estacao {
-}
-
-estacao -1- id_estacao
-id_estacao -N- microdados
-
-@endchen
-@enduml
+<!-- @startuml -->
+<!-- @startchen -->
+<!-- entity microdados { -->
+<!-- } -->
+<!-- entity estacao { -->
+<!-- } -->
+<!-- relationship id_estacao { -->
+<!-- } -->
+<!-- estacao -1- id_estacao -->
+<!-- id_estacao -N- microdados -->
+<!-- @endchen -->
+<!-- @enduml -->
 
 ## Modelo de dados logico
 
 ```mermaid
 erDiagram
-    ESTACAO ||--|{ MICRODADOS : has
 
 MICRODADOS {
     t_max float
@@ -87,6 +83,8 @@ FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
 
 CREATE TABLE microdados_y2025m02 PARTITION OF microdados
 FOR VALUES FROM ('2025-02-01') TO ('2025-03-01');
+
+...
 
 CREATE INDEX ON microdados (data);
 ```

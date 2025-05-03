@@ -1,0 +1,24 @@
+SELECT
+    codigo_estacao,
+    -- to_date(data::text, 'YYYY/MM/DD') AS data,
+    -- hora_utc varchar, -- FIX: To integer
+    translate(precipitacao_total, ',', '.')::numeric AS precipitacao_total, -- BUG: Values ',4'
+    translate(pressao_atm_hora, ',', '.')::numeric AS pressao_atm_hora,
+    translate(pressao_atm_max, ',', '.')::numeric AS pressao_atm_max,
+    translate(pressao_atm_min, ',', '.')::numeric AS pressao_atm_min,
+    translate(radiacao_global, ',', '.')::numeric AS radiacao_global,
+    translate(temperatura_bulbo_hora, ',', '.')::numeric AS temperatura_bulbo_hora,
+    translate(temperatura_orvalho_hora, ',', '.')::numeric AS temperatura_orvalho_hora,
+    translate(temperatura_max, ',', '.')::numeric AS temperatura_max,
+    translate(temperatura_min, ',', '.')::numeric AS temperatura_min,
+    translate(temperatura_orvalho_max, ',', '.')::numeric AS temperatura_orvalho_max,
+    translate(temperatura_orvalho_min, ',', '.')::numeric AS temperatura_orvalho_min,
+    umidade_rel_max::int,
+    umidade_rel_min::int,
+    umidade_rel_hora::int,
+    vento_direcao::int,
+    vento_rajada_max::int,
+    vento_velocidade::int
+FROM
+    dados_temporais;
+

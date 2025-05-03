@@ -16,4 +16,8 @@ WHERE e.datahora BETWEEN '2021-01-01 00:00:00' AND '2022-01-01 00:00:00'
 
 #### 1. A consulta acima está demorando mais de 2 minutos para retornar resultados. Quais ações de otimização você sugeriria para melhorar significativamente o desempenho dessa consulta?
 
+...
+
 #### 2. Considere tanto a estrutura da base quanto a modelagem, indexação, particionamento e uso de ferramentas/funções específicas do PostGIS/PostgreSQL.
+
+...

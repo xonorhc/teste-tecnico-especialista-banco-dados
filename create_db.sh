@@ -17,76 +17,71 @@ psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
 
 # NOTE: IMPORTAR OS DADOS DO IBGE:
 
-curl "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_UF_2022.zip" \
-  --output "$DIR"/dml/uf.zip
+curl "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2024/Brasil/BR_UF_2024.zip" \
+  --output "$DIR"/data/uf.zip
 
-unzip "$DIR"/dml/uf.zip -d "$DIR"/dml/uf/
-
-ogr2ogr -f PostgreSQL \
-  PG:"host=$PGHOST user=$PGUSER password=$PGPASS dbname=$PGDATABASE" \
-  -nln unidades_federacao "$DIR"/dml/uf/*.shp \
-  -nlt PROMOTE_TO_MULTI -lco precision=NO
-
-rm -rf "$DIR"/dml/uf*
-
-curl "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_Municipios_2022.zip" \
-  --output "$DIR"/dml/municipios.zip
-
-unzip "$DIR"/dml/municipios.zip -d "$DIR"/dml/municipios/
+unzip "$DIR"/data/uf.zip -d "$DIR"/data/uf/
 
 ogr2ogr -f PostgreSQL \
   PG:"host=$PGHOST user=$PGUSER password=$PGPASS dbname=$PGDATABASE" \
-  -nln municipios "$DIR"/dml/municipios/*.shp \
+  -nln unidades_federacao "$DIR"/data/uf/*.shp \
   -nlt PROMOTE_TO_MULTI -lco precision=NO
 
-rm -rf "$DIR"/dml/municipios*
+rm -rf "$DIR"/data/uf*
 
 # NOTE: CRIAR AS TABELAS:
 
-find "$DIR"/ddl -type f -name "*.sql" -exec \
+find "$DIR"/ddl -type f -name "*.sql" -print0 | sort -z | xargs -0 -I{} \
   psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE -b \
-  -f {} \;
+  -f "{}"
 
-# NOTE: IMPORTAR OS DADOS DO INMET:
+# NOTE: DOWNLOAD DOS DADOS DO INMET:
 
 Y=2021
 
-wget --no-check-certificate -O "$DIR"/dml/$Y.zip \
+wget --no-check-certificate -O "$DIR"/data/$Y.zip \
   'https://portal.inmet.gov.br/uploads/dadoshistoricos/'$Y'.zip'
 
-unzip "$DIR"/dml/$Y.zip -d "$DIR"/dml/$Y
+unzip "$DIR"/data/$Y.zip -d "$DIR"/data/$Y
 
-# NOTE: EXTRAIR AS INFORMACOES DAS ESTACOES:
+# NOTE: IMPORTAR AS INFORMACOES DAS ESTACOES:
 
-find "$DIR"/dml/$Y/ -type f -name "*.CSV" -print0 | xargs -0 -I{} \
+find "$DIR"/data/$Y/ -type f -name "*.CSV" -print0 | xargs -0 -I{} \
   awk -F ';' 'FNR <= 8 { printf "%s;", $2 } END { print "" }' '{}' \
-  >"$DIR"/dml/$Y/estacoes.csv
+  >"$DIR"/data/$Y/estacoes.csv
+
+sed -i 's/,/\./g' "$DIR"/data/$Y/estacoes.csv
 
 psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
-  -c "\copy estacoes from '$DIR/dml/$Y/estacoes.csv' with delimiter ';' csv;"
+  -c "\copy estacoes from '$DIR/data/$Y/estacoes.csv' with delimiter ';' csv;"
 
-# NOTE: EXTRAIR OS DADOS TEMPORAIS:
+# NOTE: IMPORTAR OS DADOS TEMPORAIS:
 
-find "$DIR"/dml/$Y/ -type f -name "*.CSV" -print0 | xargs -0 -I{} \
+find "$DIR"/data/$Y/ -type f -name "*.CSV" -print0 | xargs -0 -I{} \
   awk -F ';' \
   '/CODIGO/{ CODIGO=$2; next } /UTC/{ print CODIGO ";" $1 ";" $2";" $3";" $4";" $5";" $6";" $7";" $8";" $9";" $10";" $11";" $12 ";" $13 ";" $14 ";" $15 ";" $16 ";" $17 ";" $18 ";" $19 }' '{}' \
-  >"$DIR"/dml/$Y/microdados.csv
+  >"$DIR"/data/$Y/dadostemporais.csv
+
+sed -i 's/,/\./g' "$DIR"/data/$Y/dadostemporais.csv
+
+gawk -i inplace '!/Hora/' "$DIR"/data/$Y/dadostemporais.csv
+# sed -i '/Hora/d' "$DIR"/data/$Y/dadostemporais.csv
 
 psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
-  -c "\copy microdados from '$DIR/dml/$Y/microdados.csv' with header delimiter ';' csv encoding 'win1252';"
+  -c "\copy dados_temporais from '$DIR/data/$Y/dadostemporais.csv' with delimiter ';' csv encoding 'win1252';"
 
-rm -rf "$DIR"/dml/"$Y"*
+rm -rf "$DIR"/data/"$Y"*
 
 # NOTE: ADICIONAR O ANEXO NO BANCO DE DADOS:
 
-unzip "$DIR"/dml/AREA_IMOVEL.zip -d "$DIR"/dml/area_imovel
+unzip "$DIR"/data/AREA_IMOVEL.zip -d "$DIR"/data/area_imovel
 
 ogr2ogr -f PostgreSQL \
   PG:"host=$PGHOST user=$PGUSER password=$PGPASS dbname=$PGDATABASE" \
-  -nln area_imovel "$DIR"/dml/area_imovel/*.shp \
+  -nln area_imovel "$DIR"/data/area_imovel/*.shp \
   -nlt PROMOTE_TO_MULTI -lco precision=NO
 
-rm -rf "$DIR"/dml/area_imovel/
+rm -rf "$DIR"/data/area_imovel/
 
 # NOTE: IMPORTAR DADOS DO SICAR:
 
@@ -94,12 +89,12 @@ BASIS_URL="https://geoserver.car.gov.br/geoserver/sicar/sicar_imoveis_ac/ows?ser
 LAYER="sicar:"
 LAYERNAME="sicar_imoveis_ac"
 
-ogr2ogr -skipfailures -f geojson "$DIR"/dml/$LAYERNAME.json \
+ogr2ogr -skipfailures -f geojson "$DIR"/data/$LAYERNAME.json \
   --config GDAL_HTTP_UNSAFESSL YES WFS:"$BASIS_URL" "$LAYER$LAYERNAME"
 
 ogr2ogr -f PostgreSQL \
   PG:"host=$PGHOST user=$PGUSER password=$PGPASS dbname=$PGDATABASE" \
   -nln "$LAYERNAME" \
-  "$DIR"/dml/"$LAYERNAME".json
+  "$DIR"/data/"$LAYERNAME".json
 
-rm "$DIR"/dml/"$LAYERNAME".json
+rm "$DIR"/data/"$LAYERNAME".json
