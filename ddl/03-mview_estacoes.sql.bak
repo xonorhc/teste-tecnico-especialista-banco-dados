@@ -1,14 +1,14 @@
 BEGIN;
-DROP MATERIALIZED VIEW IF EXISTS mview_estacoes;
-CREATE MATERIALIZED VIEW IF NOT EXISTS mview_estacoes AS
+DROP MATERIALIZED VIEW IF EXISTS estacoes_geom;
+CREATE MATERIALIZED VIEW IF NOT EXISTS estacoes_geom AS
 WITH e AS (
     SELECT
         regiao,
         uf,
         estacao,
         codigo,
-        st_setsrid (st_makepoint (translate(longitude, ',', '.')::numeric, translate(latitude, ',', '.')::numeric), 4326) AS wkb_geometry,
-        translate(altitude, ',', '.')::numeric AS altitude,
+        st_setsrid (st_makepoint (longitude::numeric, latitude::numeric), 4674) AS wkb_geometry,
+        altitude,
         to_date(data_fundacao::text, 'DD/MM/YY') AS data_fundacao
     FROM
         estacoes
@@ -27,7 +27,7 @@ FROM
 WHERE
     uf.cd_uf IS NOT NULL
     AND e.wkb_geometry IS NOT NULL;
-CREATE UNIQUE INDEX ON mview_estacoes (cod_estacao);
-CREATE INDEX ON mview_estacoes USING gist (wkb_geometry);
+CREATE UNIQUE INDEX ON estacoes_geom (cod_estacao);
+CREATE INDEX ON estacoes_geom USING gist (wkb_geometry);
 COMMIT;
 

@@ -1,12 +1,12 @@
 SELECT
     uf.cd_uf,
     uf.nm_uf,
-    count(me.geom) AS qtd_estacoes
+    count(eg.wkb_geometry) AS qtd_estacoes
 FROM
     unidades_federacao uf
-    LEFT JOIN mv_estacoes me
+    LEFT JOIN estacoes_geom eg
     -- ON uf.sigla_uf = me.uf
-    ON st_contains (uf.wkb_geometry, me.geom)
+    ON st_contains (uf.wkb_geometry, eg.wkb_geometry)
 WHERE
     uf.cd_uf IS NOT NULL
 GROUP BY

@@ -2,17 +2,17 @@
 
 DIR="$(dirname "$0")"
 PGHOST=$1
-PGPORT=5432
-PGDATABASE=teste
-PGUSER=$2
-PGPASS=$3
+PGPORT=$2
+PGDATABASE=$3
+PGUSER=$4
+PGPASS=$5
 
 # NOTE: CRIAR O BANCO DE DADOS (COM SUPOSTA CONFIGURACAO):
 
-psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d 'postgres' \
+psql -U "$PGUSER" -h "$PGHOST" -p "$PGPORT" -d 'postgres' \
   -c "create database $PGDATABASE with owner $PGUSER template template0 encoding 'WIN1252' locale 'pt-BR-x-icu' icu_locale 'pt-BR' locale_provider icu ;"
 
-psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
+psql -U "$PGUSER" -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" \
   -c "create extension if not exists postgis;"
 
 # NOTE: IMPORTAR OS DADOS DO IBGE:
@@ -32,7 +32,7 @@ rm -rf "$DIR"/data/uf*
 # NOTE: CRIAR AS TABELAS:
 
 find "$DIR"/ddl -type f -name "*.sql" -print0 | sort -z | xargs -0 -I{} \
-  psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE -b \
+  psql -U "$PGUSER" -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -b \
   -f "{}"
 
 # NOTE: DOWNLOAD DOS DADOS DO INMET:
@@ -52,7 +52,7 @@ find "$DIR"/data/$Y/ -type f -name "*.CSV" -print0 | xargs -0 -I{} \
 
 sed -i 's/,/\./g' "$DIR"/data/$Y/estacoes.csv
 
-psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
+psql -U "$PGUSER" -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" \
   -c "\copy estacoes from '$DIR/data/$Y/estacoes.csv' with delimiter ';' csv;"
 
 # NOTE: IMPORTAR OS DADOS TEMPORAIS:
@@ -67,8 +67,8 @@ sed -i 's/,/\./g' "$DIR"/data/$Y/dadostemporais.csv
 gawk -i inplace '!/Hora/' "$DIR"/data/$Y/dadostemporais.csv
 # sed -i '/Hora/d' "$DIR"/data/$Y/dadostemporais.csv
 
-psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d $PGDATABASE \
-  -c "\copy dados_temporais from '$DIR/data/$Y/dadostemporais.csv' with delimiter ';' csv encoding 'win1252';"
+psql -U "$PGUSER" -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" \
+  -c "\copy dadostemporais_$Y from '$DIR/data/$Y/dadostemporais.csv' with delimiter ';' csv encoding 'win1252';"
 
 rm -rf "$DIR"/data/"$Y"*
 

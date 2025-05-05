@@ -1,24 +1,23 @@
+-- WARN: Em desenvolvimento
+-- DO $$
+-- BEGIN
+--     FOR counter IN 1..12 LOOP
+--     END LOOP;
+-- END;
+-- $$;
 SELECT
     codigo_estacao,
-    -- to_date(data::text, 'YYYY/MM/DD') AS data,
-    -- hora_utc varchar, -- FIX: To integer
-    translate(precipitacao_total, ',', '.')::numeric AS precipitacao_total, -- BUG: Values ',4'
-    translate(pressao_atm_hora, ',', '.')::numeric AS pressao_atm_hora,
-    translate(pressao_atm_max, ',', '.')::numeric AS pressao_atm_max,
-    translate(pressao_atm_min, ',', '.')::numeric AS pressao_atm_min,
-    translate(radiacao_global, ',', '.')::numeric AS radiacao_global,
-    translate(temperatura_bulbo_hora, ',', '.')::numeric AS temperatura_bulbo_hora,
-    translate(temperatura_orvalho_hora, ',', '.')::numeric AS temperatura_orvalho_hora,
-    translate(temperatura_max, ',', '.')::numeric AS temperatura_max,
-    translate(temperatura_min, ',', '.')::numeric AS temperatura_min,
-    translate(temperatura_orvalho_max, ',', '.')::numeric AS temperatura_orvalho_max,
-    translate(temperatura_orvalho_min, ',', '.')::numeric AS temperatura_orvalho_min,
-    umidade_rel_max::int,
-    umidade_rel_min::int,
-    umidade_rel_hora::int,
-    vento_direcao::int,
-    vento_rajada_max::int,
-    vento_velocidade::int
+    to_date("data"::text, 'YYYY/MM/DD') AS data,
+    precipitacao_total,
+    pressao_atm_max,
+    pressao_atm_min,
+    radiacao_global,
+    temperatura_max,
+    temperatura_min,
+    vento_velocidade
 FROM
-    dados_temporais;
+    dados_temporais -- dadostemporais_2021
+WHERE
+    date_part('month', to_date("data"::text, 'YYYY/MM/DD')) = 1
+LIMIT 100;
 

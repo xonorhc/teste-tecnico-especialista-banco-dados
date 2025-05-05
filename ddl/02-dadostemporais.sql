@@ -1,4 +1,5 @@
-CREATE TABLE dados_temporais (
+-- WARN: Em desenvolvimento
+CREATE TABLE IF NOT EXISTS dadostemporais_2021 (
     codigo_estacao varchar REFERENCES estacoes (codigo),
     data varchar, -- FIX: To date
     hora_utc varchar, -- FIX: To integer?
@@ -21,4 +22,4 @@ CREATE TABLE dados_temporais (
     vento_velocidade numeric
 );
 
--- CREATE INDEX ON dados_temporais (data);
+-- CREATE INDEX ON dadostemporais (data);
