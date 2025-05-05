@@ -21,3 +21,4 @@ CREATE TABLE dados_temporais (
     vento_velocidade numeric
 );
 
+-- CREATE INDEX ON dados_temporais (data);

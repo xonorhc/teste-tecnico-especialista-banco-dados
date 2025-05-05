@@ -7,7 +7,7 @@ PGDATABASE=teste
 PGUSER=$2
 PGPASS=$3
 
-# NOTE: CRIAR O BANCO DE DADOS COM SUPOSTA CONFIGURACAO:
+# NOTE: CRIAR O BANCO DE DADOS (COM SUPOSTA CONFIGURACAO):
 
 psql -U "$PGUSER" -h "$PGHOST" -p $PGPORT -d 'postgres' \
   -c "create database $PGDATABASE with owner $PGUSER template template0 encoding 'WIN1252' locale 'pt-BR-x-icu' icu_locale 'pt-BR' locale_provider icu ;"
