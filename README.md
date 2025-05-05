@@ -11,6 +11,8 @@ Avaliar a capacidade do(a) candidato(a) de:
 
 ### Parte 1 – Modelagem e Arquitetura
 
+[/parte-1--modelagem-e-arquitetura](https://github.com/xonorhc/teste-tecnico-especialista-banco-dados/blob/main/parte-1--modelagem-e-arquitetura%0A.md)
+
 ### Parte 2 – Diagnostico de Performance
 
 ### Parte 3 – Script prático
