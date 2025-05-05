@@ -9,7 +9,7 @@ Avaliar a capacidade do(a) candidato(a) de:
 - Trabalhar com dados espaciais;
 - Manipular e cruzar dados geográficos e temporais complexos.
 
-## Parte 1 – Modelagem e Arquitetura [text](parte_1_modelagem_arquitetura)
+## Parte 1 – Modelagem e Arquitetura [](#parte_1_modelagem_arquitetura)
 
 ## Parte 2 – Diagnóstico de Performance em Consulta Temporal-Espacial
 
