@@ -13,6 +13,10 @@ Avaliar a capacidade do(a) candidato(a) de:
 
 [/parte-1--modelagem-e-arquitetura](https://github.com/xonorhc/teste-tecnico-especialista-banco-dados/blob/main/parte-1--modelagem-e-arquitetura%0A.md)
 
-### Parte 2 – Diagnostico de Performance
+### Parte 2 – Diagnóstico de Performance em Consulta Temporal-Espacial
+
+[/parte-2--diagnostico-de-performance](https://github.com/xonorhc/teste-tecnico-especialista-banco-dados/blob/main/parte-2--diagnostico-de-performance%0A.md)
 
 ### Parte 3 – Script prático
+
+[/parte-3--script-pratico](https://github.com/xonorhc/teste-tecnico-especialista-banco-dados/blob/main/parte-3--script-pratico%0A.md)
