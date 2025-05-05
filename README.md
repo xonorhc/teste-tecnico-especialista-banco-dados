@@ -13,4 +13,4 @@ Avaliar a capacidade do(a) candidato(a) de:
 
 ### Parte 2 – Diagnostico de Performance
 
-### Parte 3 – Script pratico
+### Parte 3 – Script prático
