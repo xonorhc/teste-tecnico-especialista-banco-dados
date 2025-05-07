@@ -1,11 +1,11 @@
 #!/bin/bash
 
 DIR="$(dirname "$0")"
-PGHOST=$1
-PGPORT=$2
-PGDATABASE=$3
-PGUSER=$4
-PGPASS=$5
+PGHOST='localhost'         # $1
+PGPORT='5432'              # $2
+PGDATABASE='teste_tecnico' # $3
+PGUSER='postgres'          # $4
+PGPASS=''                  # $5
 
 # NOTE: CRIAR O BANCO DE DADOS (COM SUPOSTA CONFIGURACAO):
 
